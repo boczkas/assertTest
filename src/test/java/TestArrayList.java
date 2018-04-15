@@ -242,4 +242,139 @@ public class TestArrayList {
                     " has been thrown for toArray() call on null object";
         }
     }
+
+    /////// Dopytac: <T> T[] toArray(T[] a);
+
+    private static void add_3_ElementsAdded_sizeOfListIsEqualTo_3(){
+        // given
+        list.add("Java");
+        list.add("Academy");
+        list.add("Course");
+
+        // when
+
+        // then
+        assert list.size() == 3 : "After add() call for 3 elements size of array is different than 3";
+    }
+
+    private static void add_elementAdded_listContainsElement(){
+        // given
+
+        // when
+        list.add("Przemek");
+
+        // then
+        assert list.contains("Przemek"): "After add() of element contains does not return true for it";
+    }
+
+    private static void add_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try{
+            list.add(new String("Przemek"));
+        }
+        catch (Exception e){
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for add() call on null object";
+        }
+    }
+
+    private static void remove_listContainsElement_removesElementFromList(){
+        // given
+        String element = "element";
+        list.add(element);
+
+        // when
+        list.remove(element);
+
+        // then
+        assert list.contains(element) == false : "After remove() call for element existing in the list (present once) " +
+                "it is still in the list";
+    }
+
+    private static void remove_listDoesNotContainsElement_listIsNotChanged(){
+        // given
+        String element1 = "element1";
+        String element2 = "element2";
+
+        // when
+        list.add(element1);
+        list.remove(element2);
+
+        // then
+        assert list.size() == 1 : "remove() changed the list even there was no element to be removed";
+    }
+
+    private static void remove_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try{
+            list.remove(new String("Przemek"));
+        }
+        catch (Exception e){
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for remove() call on null object";
+        }
+    }
+
+    private static void containsAll_listContainsElements_returnsTrue(){
+        // given
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("Java");
+        arrayList.add("Academy");
+        arrayList.add("Course");
+
+        // when
+        list.add("Java");
+        list.add("Academy");
+        list.add("Course");
+
+        // then
+        assert list.containsAll(arrayList) : "containsAll() returns false even when all of elements are present in the list";
+    }
+
+    private static void containsAll_listDoesNotContainsElements_returnsFalse(){
+        // given
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("Java");
+        arrayList.add("Academy");
+        arrayList.add("Course");
+
+        // when
+        list.add("Java");
+        list.add("Academy");
+
+        // then
+        assert !list.containsAll(arrayList) : "containsAll() returns true when not all of elements are present in the list";
+    }
+
+    private static void containsAll_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try{
+            list.containsAll(new ArrayList<>());
+        }
+        catch (Exception e){
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for containsAll() call on null object";
+        }
+    }
+
+    private static void addAll_ads_listWith_3_elementsToList_sizeIs_3(){
+        // given
+
+        // when
+
+        // then
+        assert : "";
+    }
 }
