@@ -1,31 +1,9 @@
-public class Test {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    static Report report;
-
-    public Test() {
-        report = new Report();
-    }
-
-    public void assertTrue(boolean condition, String failMessage){
-        String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-
-        if(methodName.equals("assertFalse")){
-            methodName = Thread.currentThread().getStackTrace()[3].getMethodName();
-        }
-
-        try {
-            assert condition : "";
-            report.addPass(methodName);
-        } catch (AssertionError e){
-            report.addFail(methodName, failMessage);
-        }
-    }
-
-    public void assertFalse(boolean condition, String failMessage){
-        assertTrue(!condition, failMessage);
-    }
-
-    public void showReport(){
-        report.showReport();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD) //can use in method only.
+public @interface Test {
 }
