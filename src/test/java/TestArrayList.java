@@ -2,19 +2,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import static java.util.Arrays.sort;
-import static java.util.Arrays.stream;
 
 
 public class TestArrayList {
 
     private static List list;
+    private static Test test;
 
-    public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-
+    public static void main(String[] args) throws ClassNotFoundException {
+        test = new Test();
         Stream<Method> methodStream = Arrays.stream(Class.forName("TestArrayList").getDeclaredMethods());
 
         methodStream
@@ -23,17 +20,7 @@ public class TestArrayList {
                 .filter(method -> method.getReturnType().equals(Void.TYPE))
                 .forEach(invokeMethod());
 
-//        for(Method method : Class.forName("TestArrayList").getDeclaredMethods()){
-//            if (!method.getName().equals("main")) {
-//
-//                System.out.println(method.getName() + method.getReturnType());
-//                list = setupArrayList();
-//                method.invoke(method);
-//
-//                list = setupLinkedList();
-//                method.invoke(method);
-//            }
-//        }
+        test.showReport();
     }
 
     private static Consumer<Method> invokeMethod() {
@@ -43,7 +30,8 @@ public class TestArrayList {
                 method.invoke(method);
                 list = setupLinkedList();
                 method.invoke(method);
-                System.out.println(method);
+//                System.out.println(method);
+
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
@@ -66,16 +54,19 @@ public class TestArrayList {
         // when
 
         // then
-        assert list.size() == 0 : "size returns value different than 0 for empty list";
+        test.assertTrue(list.size() == 1, "size() returns value different than 0 for empty list");   // proba, powinno byc 0
+
     }
 
     private static void size_forListWithOneElement_returns_1() {
         // given
+        String element = "element";
 
         // when
+        list.add(element);
 
         // then
-        assert true : "size returns value different than 1 for empty list";
+        test.assertTrue(list.size() == 1,"size() returns value different than 1 for empty list");
     }
 
     private static void isEmpty_forEmptyList_returnsTrue() {
@@ -84,7 +75,7 @@ public class TestArrayList {
         // when
 
         // then
-        assert list.isEmpty() : "isEmpty returns false for empty list";
+        test.assertTrue(list.isEmpty(), "isEmpty() returns false for empty list");
     }
 
     private static void isEmpty_forNonEmptyList_returnsFalse() {
@@ -94,7 +85,7 @@ public class TestArrayList {
         // when
 
         // then
-        assert !list.isEmpty() : "isEmpty returns true for non-empty list";
+        test.assertFalse(list.isEmpty(), "isEmpty returns true for non-empty list");
     }
 
     private static void isEmpty_addElementRemoveElement_returnsTrue() {
@@ -105,7 +96,7 @@ public class TestArrayList {
         list.remove(0);
 
         // then
-        assert list.isEmpty() : "isEmpty returns false for empty list";
+        test.assertTrue(list.isEmpty(), "isEmpty returns false for empty list");
     }
 
     private static void isEmpty_forReferenceToNull_throwsNullPointerException() {
@@ -117,8 +108,9 @@ public class TestArrayList {
             list.isEmpty();
         } catch (Exception e) {
             // then
-            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
-                    " has been thrown for isEmpty() call on null object";
+            test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
+                    " has been thrown for isEmpty() call on null object");
+
         }
     }
 
@@ -128,7 +120,7 @@ public class TestArrayList {
         // when
 
         // then
-        assert !list.contains(object) : "contains returns true for empty list";
+        test.assertFalse(list.contains(object), "contains returns true for empty list");
     }
 
     private static void contains_elementPresentInList_returnsTrue() {
@@ -137,7 +129,7 @@ public class TestArrayList {
         // when
         list.add(element);
         // then
-        assert list.contains(element) : "contains returns false when element is in the list";
+        test.assertTrue(list.contains(element), "contains returns false when element is in the list");
     }
 
     private static void contains_elementNotPresentInList_returnsFalse() {
@@ -146,7 +138,7 @@ public class TestArrayList {
         // when
         list.add(element);
         // then
-        assert !list.contains(new String("Jakubowski")) : "contains returns true when element is not in the list";
+        test.assertFalse(list.contains(new String("Jakubowski")), "contains returns true when element is not in the list");
     }
 
     private static void contains_forReferenceToNull_throwsNullPointerException() {
@@ -158,8 +150,8 @@ public class TestArrayList {
             list.contains(element);
         } catch (Exception e) {
             // then
-            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
-                    " has been thrown for contains() call on null object";
+            test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
+                    " has been thrown for contains() call on null object");
         }
     }
 
@@ -174,8 +166,8 @@ public class TestArrayList {
         boolean hasNext = iterator.hasNext();
 
         // then
-        assert elementToCheck.equals(element) && hasNext == false : "iterator() returns Iterator with more than one element" +
-                " for list which contains only one element";
+        test.assertTrue(elementToCheck.equals(element) && hasNext == false , "iterator() returns Iterator with more than one element" +
+                " for list which contains only one element");
     }
 
     private static void iterator_forEmptyList_returnsIteratorWithoutElements() {
@@ -185,7 +177,7 @@ public class TestArrayList {
         // when
 
         // then
-        assert iterator.hasNext() == false : "iterator() returns Iterator with element(s) for empty list";
+        test.assertFalse(iterator.hasNext(), "iterator() returns Iterator with element(s) for empty list");
     }
 
     private static void iterator_forReferenceToNull_throwsNullPointerException() {
@@ -197,8 +189,8 @@ public class TestArrayList {
             list.iterator();
         } catch (Exception e) {
             // then
-            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
-                    " has been thrown for iterator() call on null object";
+            test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
+                    " has been thrown for iterator() call on null object");
         }
     }
 
@@ -212,7 +204,7 @@ public class TestArrayList {
         Object[] array = list.toArray();
 
         // then
-        assert array.length == 3 : "toArray() returns array with different number elements than a list contains";
+        test.assertTrue(array.length == 3, "toArray() returns array with different number elements than a list contains");
     }
 
     private static void toArray_forListWithoutElements_returnsArrayWithoutElements() {
@@ -222,7 +214,7 @@ public class TestArrayList {
         Object[] array = list.toArray();
 
         // then
-        assert array.length == 0 : "toArray() returns array with elements for list without elements";
+        test.assertTrue(array.length == 0, "toArray() returns array with elements for list without elements");
     }
 
     private static void toArray_forReferenceToNull_throwsNullPointerException() {
@@ -234,8 +226,8 @@ public class TestArrayList {
             list.toArray();
         } catch (Exception e) {
             // then
-            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
-                    " has been thrown for toArray() call on null object";
+            test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
+                    " has been thrown for toArray() call on null object");
         }
     }
 
@@ -250,7 +242,7 @@ public class TestArrayList {
         // when
 
         // then
-        assert list.size() == 3 : "After add() call for 3 elements size of array is different than 3";
+        test.assertTrue(list.size() == 3, "After add() call for 3 elements size of array is different than 3");
     }
 
     private static void add_elementAdded_listContainsElement() {
@@ -260,7 +252,7 @@ public class TestArrayList {
         list.add("Przemek");
 
         // then
-        assert list.contains("Przemek") : "After add() of element contains does not return true for it";
+        test.assertTrue(list.contains("Przemek"), "After add() of element contains does not return true for it");
     }
 
     private static void add_forReferenceToNull_throwsNullPointerException() {
@@ -272,8 +264,8 @@ public class TestArrayList {
             list.add(new String("Przemek"));
         } catch (Exception e) {
             // then
-            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
-                    " has been thrown for add() call on null object";
+            test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
+                    " has been thrown for add() call on null object");
         }
     }
 
@@ -370,9 +362,10 @@ public class TestArrayList {
         arrayList.add("Course");
 
         // when
+        list.addAll(arrayList);
 
         // then
-        assert arrayList.size() == 3 : "After addAll() of 3 elements for empty list, list size is different than 3";
+        assert list.size() == 3 : "After addAll() of 3 elements for empty list, list size is different than 3";
     }
 
     private static void addAll_adsElementsToNonEmptyList_newElementsAreAddedAtEndOfList() {
@@ -675,6 +668,487 @@ public class TestArrayList {
             // then
             assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
                     " has been thrown for clear() call on null object";
+        }
+    }
+
+    private static void equals_forTheSameLists_returnsTrue(){
+        // given
+        List newList = list;
+
+        // when
+        
+        // then
+        assert list.equals(newList): "equals() returns false for the same list";
+    }
+
+    private static void equals_forDifferentLists_returnsFalse(){
+        // given
+        ArrayList<String> newList = new ArrayList<>();
+        newList.add("element");
+        // when
+
+        // then
+        assert list.equals(newList) == false : "equals() for different lists returns true";
+    }
+
+    private static void equals_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.equals(new ArrayList());
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for equals() call on null object";
+        }
+    }
+
+    private static void hashCode_forSameList_isEqual(){
+        // given
+        List newList = list;
+        // when
+
+        // then
+        assert list.hashCode() == newList.hashCode() : "hashCode() returns false for the same list";
+    }
+
+    private static void hashCode_forEmpyList_returns_1(){
+        // given
+
+        // when
+
+        // then
+        assert list.hashCode() == 1 : "hashCode() returns value different than 1 for empty list";
+    }
+
+    private static void hashCode_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.hashCode();
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for hashCode() call on null object";
+        }
+    }
+
+    private static void get_forEmptyList_throwsIndexOutOfBoundException(){
+        // given
+
+        // when
+        try{
+            list.get(0);
+        } catch (Exception e){
+            // then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "Exception different than index out of bound exception" +
+                    " has been thrown for get() call on empty list";
+        }
+    }
+
+    private static void get_listWithElementOnIndex_0_calledWith_0_returnsElement(){
+        // given
+        String element = "element";
+        list.add(element);
+
+        // when
+
+        // then
+        assert list.get(0).equals(element) : "get() call for element on index 0 returns different element";
+    }
+
+    private static void get_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.get(0);
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for get() call on null object";
+        }
+    }
+
+    private static void set_emptyListAdElementAtIndex_0_throwsIndexOutOfBoundException(){
+        // given
+        String element = "element";
+        // when
+        try{
+            list.set(0, element);
+        } catch (Exception e){
+            // then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "Exception different than index out of bound exception" +
+                    " has been thrown for set() call on empty list";
+        }
+    }
+
+    private static void set_listWithElementAtPosition_0_setForNewElementAtPosition_0_elementIsSetAtPosition_0(){
+        // given
+        String element1 = "element1";
+        String element2 = "element2";
+
+        // when
+        list.add(element1);
+        list.set(0, element2);
+
+        // then
+        assert list.get(0).equals(element2): "set() does not put element at desired position";
+    }
+
+    private static void set_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.set(0, "element");
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for set() call on null object";
+        }
+    }
+
+    private static void addWithIndex_emptyListAddAt_0_index_throwsIndexOutOfBoundException(){
+        // given
+
+        // when
+        try{
+            list.add(0, "element");
+        } catch (Exception e){
+            //then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "add() with index does throw exception" +
+                    " different than IndexOutOfBoundsException in case of add on empty list";
+        }
+    }
+
+    private static void addWithIndex_listWithOneElement_addElementAt_0_position_newElementIsAt_0_position_previousElementIsShifted(){
+        // given
+        String element1 = "element1";
+        String element2 = "element2";
+
+        // when
+        list.add(element1);
+        list.add(0, element2);
+
+        // then
+        assert (list.get(0) == element2) && (list.get(1) == element1) : "add() with index specified does not put element at " +
+                "specified position or does not shift elements correctly";
+    }
+
+    private static void addWithIndex_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.add(0, "element");
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for add() with index call on null object";
+        }
+    }
+
+    private static void remove_withIndex_emptyList_throwsIndexOutOfBoundException(){
+        // given
+
+        // when
+        try{
+            list.remove(0);
+        } catch (Exception e){
+            // then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "Exception different than IndexOutOfBoundsException" +
+                    " has been thrown for remove() call on empty list";
+        }
+    }
+    
+    private static void remove_withIndexRemoveCallForListWithOneElement_sizeOfListIs_0(){
+        // given
+        String element = "element";
+        list.add(element);
+
+        // when
+        list.remove(0);
+
+        // then
+        assert list.size() == 0 : "Size is different than 0 for remove() call on 1 elements' list";
+    }
+
+    private static void removeWithIndex_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.remove(0);
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for remove() with index call on null object";
+        }
+    }
+
+    private static void indexOf_emptyList_throwsIndexOutBoundException(){
+        // given
+        String element = "element";
+        // when
+        try {
+            list.indexOf(element);
+        } catch (Exception e){
+            // then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "Exception different than IndexOutOfBoundsException" +
+                    " has been thrown for indexOf() call on empty list";
+        }
+    }
+
+    private static void indexOf_listContainsElement_indexOfElementIsReturned(){
+        // given
+        String element = "element";
+        list.add(element);
+
+        // when
+
+        // then
+        assert list.indexOf(element) == 0 : "Index different than element's index has been returned for indexOf()";
+    }
+
+    private static void indexOf_forReferenceToNull_throwsNullPointerException() {
+        // given
+        String element = "element";
+        list = null;
+
+        // when
+        try {
+            list.indexOf(element);
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for indexOf() with index call on null object";
+        }
+    }
+
+    private static void lastIndexOf_twoSameElementsInList_returnsIndexOfLastOne(){
+        // given
+        String element = "element";
+
+        // when
+        list.add(element);
+        list.add(element);
+
+        // then
+        assert list.lastIndexOf(element) == 1 : "Index different than 1 returned by lastIndexOf() for list which is containing last requested" +
+                " element at position 1";
+    }
+
+    private static void lastIndexOf_noElementInList_returns_negative1(){
+        // given
+        String element = "element";
+        String differentElement = "differentElement";
+
+        // when
+        list.add(differentElement);
+        list.add(differentElement);
+
+        // then
+        assert list.indexOf(element) == -1 : "Value different than -1 returned by lastIndexOf() for list which does not contains " +
+                "specyfic element";
+    }
+
+    private static void lastIndexOf_forReferenceToNull_throwsNullPointerException() {
+        // given
+        String element = "element";
+        list = null;
+
+        // when
+        try {
+            list.lastIndexOf(element);
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for lastIndexOf() with index call on null object";
+        }
+    }
+
+    private static void listIterator_emptyList_doesNotHaveElements(){
+        // given
+
+        // when
+        ListIterator listIterator = list.listIterator();
+
+        // then
+        assert listIterator.hasNext() == false : "listIterator() returns non empty iterator for empty list";
+    }
+
+    private static void listIterator_listContainsObjects_iterationOverIteratorReturnsObjectsInSameOrder(){
+        // given
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+        boolean result = true;
+
+        // when
+        list.addAll(arrayList);
+        Iterator listIterator = list.listIterator();
+
+        // then
+        int i = 0;
+        while (listIterator.hasNext()){
+            if(!listIterator.next().equals(arrayList.get(i))){
+                result = false;
+            }
+            i++;
+        }
+
+        assert result : "listIterator() returns elements in different order than they are stored in list";
+    }
+
+    private static void listIterator_forReferenceToNull_throwsNullPointerException() {
+        // given
+        list = null;
+
+        // when
+        try {
+            list.listIterator();
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for iterator() with index call on null object";
+        }
+    }
+
+    private static void listIterator_withIndex_indexOutOfBound_throwsIndexOutOfBoundException(){
+        // given
+        String element = "element";
+        list.add(element);
+
+        // when
+        try{
+            list.listIterator(1);
+        } catch (Exception e){
+            // then
+            assert e.getClass().equals(IndexOutOfBoundsException.class) : "Exception different than IndexOutOfBoundException " +
+                    "has been thrown for listIterator(index) when index is out of bound";
+        }
+    }
+
+    private static void listIterator_withIndex_elementsInList_elementsFromSpecyficIndexAreReturned(){
+        // given
+        boolean result = true;
+        int index = 1;
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+
+        // when
+        list.addAll(arrayList);
+        Iterator listIterator = list.listIterator(index);
+
+        // then
+
+        while (listIterator.hasNext()){
+            if(!listIterator.next().equals(arrayList.get(index))){
+                result = false;
+            }
+            index++;
+        }
+
+        // then
+        assert result : "Elements different than specified in list has been returned for listIterator() with index specified";
+    }
+
+    private static void listIterator_withIndex_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try {
+            list.listIterator();
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for iterator() with index call on null object";
+        }
+    }
+
+    private static void sublist_startEndIndexTheSame_emptyListReturned(){
+        // given
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+
+        // when
+        list.addAll(arrayList);
+        List newList = list.subList(0,0);
+
+        // then
+        assert newList.size() == 0 : "sublist() returns non empty list for same start and end index as arguments";
+    }
+
+    private static void sublist_startEndIndexDifferenceOfOneInStartEndIndexes_returnsOneElement(){
+        // given
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+
+        // when
+        list.addAll(arrayList);
+        List newList = list.subList(0,1);
+
+        // then
+        assert newList.size() == 1 : "sublist() returns different amount of elements than 1 for start/end index " +
+                " in difference of 1";
+    }
+
+    private static void sublist_withIndex_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try {
+            list.subList(0,1);
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for subList() call on null object";
+        }
+    }
+
+    private static void spliterator_listWith_4_elements_returnsIteratorSize_4(){
+        // given
+        list.addAll(Arrays.asList("Java", "Academy", "Class", "Course"));
+
+        // when
+        Spliterator<String> spliterator = list.spliterator();
+
+        // then
+        assert spliterator.getExactSizeIfKnown() == list.size() : "spliterator() returns object with different size " +
+                "than object for which it was called";
+    }
+
+    private static void spliterator_emptyList_returnsIteratorSize_0(){
+        // given
+
+        // when
+        Spliterator<String> spliterator = list.spliterator();
+        // then
+        assert spliterator.getExactSizeIfKnown() == 0 : "spliterator() for empty list returns object with size different " +
+                "than 0";
+    }
+
+    private static void spliterator_withIndex_forReferenceToNull_throwsNullPointerException(){
+        // given
+        list = null;
+
+        // when
+        try {
+            list.spliterator();
+        } catch (Exception e) {
+            // then
+            assert e.getClass().equals(NullPointerException.class) : "Exception different than null pointer exception" +
+                    " has been thrown for subList() call on null object";
         }
     }
 }
