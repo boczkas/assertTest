@@ -15,9 +15,8 @@ public class TestArrayList {
         Stream<Method> methodStream = Arrays.stream(Class.forName("TestArrayList").getDeclaredMethods());
 
         methodStream
-                .filter(method -> !method.getName().equals("main"))
-                .filter(method -> !method.getName().startsWith("lambda"))
-                .filter(method -> method.getReturnType().equals(Void.TYPE))
+                .filter(method -> method.getAnnotations().length != 0)
+                .filter(method -> method.getAnnotations()[0].annotationType().getName().equals(Test.class.getName()))
                 .forEach(invokeMethod());
 
         test.showReport();
@@ -31,7 +30,6 @@ public class TestArrayList {
                 list = setupLinkedList();
                 method.invoke(method);
 //                System.out.println(method);
-
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
