@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -46,6 +47,20 @@ public class TestArrayList {
         return new LinkedList();
     }
 
+    private static String createElement() {
+        return "element";
+    }
+
+    private static String createElement(String string){
+        return string;
+    }
+
+    private static ArrayList<String> createArrayListWith3Elements(){
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList("Java", "Academy", "Course"));
+        return arrayList;
+    }
+
     @Test
     private static void size_forEmptyList_returns_0() {
         // given
@@ -60,10 +75,9 @@ public class TestArrayList {
     @Test
     private static void size_forListWithOneElement_returns_1() {
         // given
-        String element = "element";
 
         // when
-        list.add(element);
+        list.add(createElement());
 
         // then
         test.assertTrue(list.size() == 1,"size() returns value different than 1 for empty list");
@@ -82,7 +96,7 @@ public class TestArrayList {
     @Test
     private static void isEmpty_forNonEmptyList_returnsFalse() {
         // given
-        list.add(1);
+        list.add(createElement());
 
         // when
 
@@ -95,7 +109,7 @@ public class TestArrayList {
         // given
 
         // when
-        list.add(1);
+        list.add(createElement());
         list.remove(0);
 
         // then
@@ -120,41 +134,42 @@ public class TestArrayList {
     @Test
     private static void contains_forEmptyList_returnsFalse() {
         // given
-        Object object = new Object();
+
         // when
 
         // then
-        test.assertFalse(list.contains(object), "contains returns true for empty list");
+        test.assertFalse(list.contains(createElement()), "contains returns true for empty list");
     }
 
     @Test
     private static void contains_elementPresentInList_returnsTrue() {
         // given
-        String element = "Przemek";
+
         // when
-        list.add(element);
+        list.add(createElement());
+
         // then
-        test.assertTrue(list.contains(element), "contains returns false when element is in the list");
+        test.assertTrue(list.contains(createElement()), "contains returns false when element is in the list");
     }
 
     @Test
     private static void contains_elementNotPresentInList_returnsFalse() {
         // given
-        String element = "Przemek";
+
         // when
-        list.add(element);
+        list.add(createElement());
         // then
-        test.assertFalse(list.contains(new String("Jakubowski")), "contains returns true when element is not in the list");
+        test.assertFalse(list.contains(createDifferentElement()), "contains returns true when element is not in the list");
     }
 
     @Test
     private static void contains_forReferenceToNull_throwsNullPointerException() {
         // given
         list = null;
-        String element = "element";
+
         // when
         try {
-            list.contains(element);
+            list.contains(createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -165,8 +180,7 @@ public class TestArrayList {
     @Test
     private static void iterator_forListContainingOneElement_returnsIteratorWithOneElement() {
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
         Iterator<String> iterator = list.iterator();
 
         // when
@@ -174,7 +188,7 @@ public class TestArrayList {
         boolean hasNext = iterator.hasNext();
 
         // then
-        test.assertTrue(elementToCheck.equals(element) && hasNext == false , "iterator() returns Iterator with more than one element" +
+        test.assertTrue(elementToCheck.equals(createElement()) && hasNext == false , "iterator() returns Iterator with more than one element" +
                 " for list which contains only one element");
     }
 
@@ -207,9 +221,7 @@ public class TestArrayList {
     @Test
     private static void toArray_forListWith_3_elements_returnsArrayWith_3_elements() {
         // given
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // when
         Object[] array = list.toArray();
@@ -249,9 +261,7 @@ public class TestArrayList {
     @Test
     private static void add_3_ElementsAdded_sizeOfListIsEqualTo_3() {
         // given
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // when
 
@@ -264,10 +274,10 @@ public class TestArrayList {
         // given
 
         // when
-        list.add("Przemek");
+        list.add(createElement());
 
         // then
-        test.assertTrue(list.contains("Przemek"), "After add() of element contains does not return true for it");
+        test.assertTrue(list.contains(createElement()), "After add() of element contains does not return true for it");
     }
 
     @Test
@@ -277,7 +287,7 @@ public class TestArrayList {
 
         // when
         try {
-            list.add(new String("Przemek"));
+            list.add(createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -288,14 +298,13 @@ public class TestArrayList {
     @Test
     private static void remove_listContainsElement_removesElementFromList() {
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
 
         // when
-        list.remove(element);
+        list.remove(createElement());
 
         // then
-        test.assertTrue(list.contains(element) == false, "After remove() call for element existing in the list (present once) " +
+        test.assertTrue(list.contains(createElement()) == false, "After remove() call for element existing in the list (present once) " +
                 "it is still in the list");
     }
 
@@ -1229,5 +1238,9 @@ public class TestArrayList {
             test.assertTrue( e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
                     " has been thrown for subList() call on null object");
         }
+    }
+
+    private static String createDifferentElement() {
+        return new String("Jakubowski");
     }
 }
