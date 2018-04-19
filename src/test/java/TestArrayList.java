@@ -68,7 +68,7 @@ public class TestArrayList {
         // when
 
         // then
-        test.assertTrue(list.size() == 1, "size() returns value different than 0 for empty list");   // proba, powinno byc 0
+        test.assertTrue(list.size() == 0, "size() returns value different than 0 for empty list");
 
     }
 
@@ -159,7 +159,7 @@ public class TestArrayList {
 
         // when
         list.add(createElement());
-        
+
         // then
         test.assertFalse(list.contains(createDifferentElement()), "contains returns true when element is not in the list");
     }
@@ -1240,6 +1240,18 @@ public class TestArrayList {
             test.assertTrue( e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
                     " has been thrown for subList() call on null object");
         }
+    }
+
+
+    @Test
+    private static void testingTestEnvironmentFalse() {
+        // given
+
+        // when
+
+        // then
+        test.assertTrue(false, "testing test environment");
+
     }
 
     private static String createDifferentElement() {
