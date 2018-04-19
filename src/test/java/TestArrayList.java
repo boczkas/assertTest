@@ -96,9 +96,10 @@ public class TestArrayList {
     @Test
     private static void isEmpty_forNonEmptyList_returnsFalse() {
         // given
-        list.add(createElement());
+
 
         // when
+        list.add(createElement());
 
         // then
         test.assertFalse(list.isEmpty(), "isEmpty returns true for non-empty list");
@@ -158,6 +159,7 @@ public class TestArrayList {
 
         // when
         list.add(createElement());
+        
         // then
         test.assertFalse(list.contains(createDifferentElement()), "contains returns true when element is not in the list");
     }
