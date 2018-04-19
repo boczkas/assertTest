@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -6,14 +5,14 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 
-public class TestArrayList {
+public class TestList {
 
     private static List list;
     private static GentleAssert test;
 
-    public static void main(String[] args) throws ClassNotFoundException {
+    public static void main(String[] args){
         test = new GentleAssert();
-        Stream<Method> methodStream = Arrays.stream(Class.forName("TestArrayList").getDeclaredMethods());
+        Stream<Method> methodStream = Arrays.stream(TestList.class.getDeclaredMethods());
 
         methodStream
                 .filter(method -> method.getAnnotations().length != 0)
@@ -61,6 +60,14 @@ public class TestArrayList {
         return arrayList;
     }
 
+    private static List<String> createListWith2Elements() {
+        return Arrays.asList("Przemek", "Jakubowski");
+    }
+
+    private static String createDifferentElement() {
+        return "Different";
+    }
+
     @Test
     private static void size_forEmptyList_returns_0() {
         // given
@@ -96,7 +103,6 @@ public class TestArrayList {
     @Test
     private static void isEmpty_forNonEmptyList_returnsFalse() {
         // given
-
 
         // when
         list.add(createElement());
@@ -306,19 +312,17 @@ public class TestArrayList {
         list.remove(createElement());
 
         // then
-        test.assertTrue(list.contains(createElement()) == false, "After remove() call for element existing in the list (present once) " +
+        test.assertFalse(list.contains(createElement()), "After remove() call for element existing in the list (present once) " +
                 "it is still in the list");
     }
 
     @Test
     private static void remove_listDoesNotContainsElement_listIsNotChanged() {
         // given
-        String element1 = "element1";
-        String element2 = "element2";
 
         // when
-        list.add(element1);
-        list.remove(element2);
+        list.add(createElement());
+        list.remove(createDifferentElement());
 
         // then
         test.assertTrue( list.size() == 1, "remove() changed the list even there was no element to be removed");
@@ -331,7 +335,7 @@ public class TestArrayList {
 
         // when
         try {
-            list.remove(new String("Przemek"));
+            list.remove(createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -343,14 +347,10 @@ public class TestArrayList {
     private static void containsAll_listContainsElements_returnsTrue() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
-        arrayList.add("Course");
+        arrayList.addAll(createArrayListWith3Elements());
 
         // when
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // then
         test.assertTrue(list.containsAll(arrayList), "containsAll() returns false even when all of elements are present in the list");
@@ -360,13 +360,11 @@ public class TestArrayList {
     private static void containsAll_listDoesNotContainsElements_returnsFalse() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
-        arrayList.add("Course");
+        arrayList.addAll(createArrayListWith3Elements());
 
         // when
-        list.add("Java");
-        list.add("Academy");
+        list.add(createArrayListWith3Elements().get(0));
+        list.add(createArrayListWith3Elements().get(1));
 
         // then
         test.assertFalse(list.containsAll(arrayList), "containsAll() returns true when not all of elements are present in the list");
@@ -390,13 +388,9 @@ public class TestArrayList {
     @Test
     private static void addAll_adsListWith_3_elementsToList_listSizeIs_3() {
         // given
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
-        arrayList.add("Course");
 
         // when
-        list.addAll(arrayList);
+        list.addAll(createArrayListWith3Elements());
 
         // then
         test.assertTrue(list.size() == 3, "After addAll() of 3 elements for empty list, list size is different than 3");
@@ -405,19 +399,13 @@ public class TestArrayList {
     @Test
     private static void addAll_adsElementsToNonEmptyList_newElementsAreAddedAtEndOfList() {
         // given
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Przemek");
-        arrayList.add("Jakubowski");
-
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // when
-        list.addAll(arrayList);
+        list.addAll(createListWith2Elements());
 
         // then
-        test.assertTrue(list.indexOf("Przemek") == 3, "addAll() is not adding elements from the end of the list ");
+        test.assertTrue(list.indexOf(createListWith2Elements().get(0)) == 3, "addAll() is not adding elements from the end of the list ");
     }
 
     @Test
@@ -438,36 +426,25 @@ public class TestArrayList {
     @Test
     private static void addAllWithIndexSpecified_adsElementsToNonEmptyListAtSpecifiedIndex_newElementsAreAddedStartingFromSpecifiedIndex() {
         // given
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Przemek");
-        arrayList.add("Jakubowski");
-
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // when
-        list.addAll(1, arrayList);
+        list.addAll(1, createListWith2Elements());
 
         // then
-        test.assertTrue(list.indexOf("Przemek") == 1, "addAll() withIndexSpecified is adding elements add incorrect position");
+        test.assertTrue(list.indexOf(createListWith2Elements().get(0)) == 1, "addAll() withIndexSpecified is adding elements add incorrect position");
     }
 
     @Test
     private static void addAllWithIndexSpecified_adsElementsToNonEmptyListAtSpecifiedIndex_shiftsElementsWhichAreAfterSpecifiedIndex() {
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Przemek");
-        arrayList.add("Jakubowski");
-
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        // given
+        list.addAll(createArrayListWith3Elements());
 
         // when
-        list.addAll(1, arrayList);
+        list.addAll(1, createListWith2Elements());
 
         // then
-        test.assertTrue(list.indexOf("Academy") == 3, "addAll() withIndexSpecified is not shifting elements which are after specified index correctly");
+        test.assertTrue(list.indexOf(createArrayListWith3Elements().get(1)) == 3, "addAll() withIndexSpecified is not shifting elements which are after specified index correctly");
     }
 
     @Test
@@ -488,32 +465,24 @@ public class TestArrayList {
     @Test
     private static void removeAll_listContainsSpecifiedElements_elementsAreRemovedFromList() {
         // given
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
 
-        list.add("Java");
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
+        list.add(createElement());
 
         // when
-        list.removeAll(arrayList);
+        list.removeAll(createArrayListWith3Elements());
 
         // then
-        test.assertTrue(list.containsAll(arrayList) == false, "Elements are still present in the list after removeAll() call for them");
+        test.assertFalse(list.containsAll(createArrayListWith3Elements()), "Elements are still present in the list after removeAll() call for them");
     }
 
     @Test
     private static void removeAll_listDoesNotContainElements_listRemainsUnchanged() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Przemek");
-        arrayList.add("Jakubowski");
+        arrayList.addAll(createListWith2Elements());
 
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         ArrayList<String> arrayListWithElementsOfList = new ArrayList<>();
         arrayListWithElementsOfList.addAll(list);
@@ -545,11 +514,8 @@ public class TestArrayList {
     private static void retainAll_bothListsContainsSameElements_listHasNotBeenChanged() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
-
-        list.add("Java");
-        list.add("Academy");
+        arrayList.addAll(createListWith2Elements());
+        list.addAll(createListWith2Elements());
 
         // when
         list.retainAll(arrayList);
@@ -562,18 +528,16 @@ public class TestArrayList {
     private static void retainAll_oneElementIsDifferentInLists_differentElementHasBeenRemoved() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Java");
-        arrayList.add("Academy");
+        arrayList.addAll(createListWith2Elements());
 
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createListWith2Elements());
+        list.add(createDifferentElement());
 
         // when
         list.retainAll(arrayList);
 
         // then
-        test.assertTrue(list.contains("Course") == false, "retainAll() does not remove element which was present in one list" +
+        test.assertFalse(list.contains(createDifferentElement()), "retainAll() does not remove element which was present in one list" +
                 " but not in the other");
     }
 
@@ -606,14 +570,11 @@ public class TestArrayList {
     private static void replaceAll_changesEveryElementAccordingToOperation() {
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("Javaa");
-        arrayList.add("Academya");
-        arrayList.add("Coursea");
+        arrayList.addAll(Arrays.asList(createArrayListWith3Elements().get(0) + "a",
+                                       createArrayListWith3Elements().get(1) + "a",
+                                       createArrayListWith3Elements().get(2) + "a"));
 
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
-
+        list.addAll(createArrayListWith3Elements());
 
         // when
         list.replaceAll(e -> e + "a");
@@ -640,9 +601,7 @@ public class TestArrayList {
     @Test
     private static void sort_unsortedList_returntSortedList() {
         // given
-        list.add("Java");
-        list.add("Academy");
-        list.add("Course");
+        list.addAll(createArrayListWith3Elements());
 
         // when
         list.sort(String.CASE_INSENSITIVE_ORDER);
@@ -657,9 +616,7 @@ public class TestArrayList {
     @Test
     private static void sort_sortedArray_indexesOfElementsHaveNotChanged(){
         // given
-        list.add("Academy");
-        list.add("Course");
-        list.add("Java");
+        list.addAll(createArrayListWith3Elements());
 
         // when
         list.sort(String.CASE_INSENSITIVE_ORDER);
@@ -689,9 +646,7 @@ public class TestArrayList {
     @Test
     private static void clear_forListWithElements_removesElementsFromList(){
         // given
-        list.add("Academy");
-        list.add("Course");
-        list.add("Java");
+        list.addAll(createArrayListWith3Elements());
 
         // when
         list.clear();
@@ -740,11 +695,11 @@ public class TestArrayList {
     private static void equals_forDifferentLists_returnsFalse(){
         // given
         ArrayList<String> newList = new ArrayList<>();
-        newList.add("element");
+        newList.add(createElement());
         // when
 
         // then
-        test.assertTrue(list.equals(newList) == false, "equals() for different lists returns true");
+        test.assertFalse(list.equals(newList), "equals() for different lists returns true");
     }
 
     @Test
@@ -814,13 +769,12 @@ public class TestArrayList {
     @Test
     private static void get_listWithElementOnIndex_0_calledWith_0_returnsElement(){
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
 
         // when
 
         // then
-        test.assertTrue(list.get(0).equals(element), "get() call for element on index 0 returns different element");
+        test.assertTrue(list.get(0).equals(createElement()), "get() call for element on index 0 returns different element");
     }
 
     @Test
@@ -841,10 +795,10 @@ public class TestArrayList {
     @Test
     private static void set_emptyListAdElementAtIndex_0_throwsIndexOutOfBoundException(){
         // given
-        String element = "element";
+
         // when
         try{
-            list.set(0, element);
+            list.set(0, createElement());
         } catch (Exception e){
             // then
             test.assertTrue(e.getClass().equals(IndexOutOfBoundsException.class), "Exception different than index out of bound exception" +
@@ -855,15 +809,13 @@ public class TestArrayList {
     @Test
     private static void set_listWithElementAtPosition_0_setForNewElementAtPosition_0_elementIsSetAtPosition_0(){
         // given
-        String element1 = "element1";
-        String element2 = "element2";
 
         // when
-        list.add(element1);
-        list.set(0, element2);
+        list.add(createElement());
+        list.set(0, createDifferentElement());
 
         // then
-        test.assertTrue(list.get(0).equals(element2), "set() does not put element at desired position");
+        test.assertTrue(list.get(0).equals(createDifferentElement()), "set() does not put element at desired position");
     }
 
     @Test
@@ -873,7 +825,7 @@ public class TestArrayList {
 
         // when
         try {
-            list.set(0, "element");
+            list.set(0, createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -887,7 +839,7 @@ public class TestArrayList {
 
         // when
         try{
-            list.add(0, "element");
+            list.add(0, createElement());
         } catch (Exception e){
             //then
             test.assertTrue(e.getClass().equals(IndexOutOfBoundsException.class), "add() with index does throw exception" +
@@ -898,15 +850,13 @@ public class TestArrayList {
     @Test
     private static void addWithIndex_listWithOneElement_addElementAt_0_position_newElementIsAt_0_position_previousElementIsShifted(){
         // given
-        String element1 = "element1";
-        String element2 = "element2";
 
         // when
-        list.add(element1);
-        list.add(0, element2);
+        list.add(createElement());
+        list.add(0, createDifferentElement());
 
         // then
-        test.assertTrue ((list.get(0) == element2) && (list.get(1) == element1), "add() with index specified does not put element at " +
+        test.assertTrue ((list.get(0) == createDifferentElement()) && (list.get(1) == createElement()), "add() with index specified does not put element at " +
                 "specified position or does not shift elements correctly");
     }
 
@@ -917,7 +867,7 @@ public class TestArrayList {
 
         // when
         try {
-            list.add(0, "element");
+            list.add(0, createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -942,8 +892,7 @@ public class TestArrayList {
     @Test
     private static void remove_withIndexRemoveCallForListWithOneElement_sizeOfListIs_0(){
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
 
         // when
         list.remove(0);
@@ -970,10 +919,10 @@ public class TestArrayList {
     @Test
     private static void indexOf_emptyList_throwsIndexOutBoundException(){
         // given
-        String element = "element";
+
         // when
         try {
-            list.indexOf(element);
+            list.indexOf(createElement());
         } catch (Exception e){
             // then
             test.assertTrue(e.getClass().equals(IndexOutOfBoundsException.class), "Exception different than IndexOutOfBoundsException" +
@@ -984,24 +933,22 @@ public class TestArrayList {
     @Test
     private static void indexOf_listContainsElement_indexOfElementIsReturned(){
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
 
         // when
 
         // then
-        test.assertTrue( list.indexOf(element) == 0,  "Index different than element's index has been returned for indexOf()");
+        test.assertTrue(list.indexOf(createElement()) == 0,"Index different than element's index has been returned for indexOf()");
     }
 
     @Test
     private static void indexOf_forReferenceToNull_throwsNullPointerException() {
         // given
-        String element = "element";
         list = null;
 
         // when
         try {
-            list.indexOf(element);
+            list.indexOf(createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -1012,41 +959,35 @@ public class TestArrayList {
     @Test
     private static void lastIndexOf_twoSameElementsInList_returnsIndexOfLastOne(){
         // given
-        String element = "element";
 
         // when
-        list.add(element);
-        list.add(element);
+        list.addAll(Arrays.asList(createElement(), createElement()));
 
         // then
-        test.assertTrue(list.lastIndexOf(element) == 1, "Index different than 1 returned by lastIndexOf() for list which is containing last requested" +
+        test.assertTrue(list.lastIndexOf(createElement()) == 1, "Index different than 1 returned by lastIndexOf() for list which is containing last requested" +
                 " element at position 1");
     }
 
     @Test
     private static void lastIndexOf_noElementInList_returns_negative1(){
         // given
-        String element = "element";
-        String differentElement = "differentElement";
 
         // when
-        list.add(differentElement);
-        list.add(differentElement);
+        list.addAll(Arrays.asList(createElement(), createElement()));
 
         // then
-        test.assertTrue(list.indexOf(element) == -1, "Value different than -1 returned by lastIndexOf() for list which does not contains " +
+        test.assertTrue(list.indexOf(createDifferentElement()) == -1, "Value different than -1 returned by lastIndexOf() for list which does not contains " +
                 "specyfic element");
     }
 
     @Test
     private static void lastIndexOf_forReferenceToNull_throwsNullPointerException() {
         // given
-        String element = "element";
         list = null;
 
         // when
         try {
-            list.lastIndexOf(element);
+            list.lastIndexOf(createElement());
         } catch (Exception e) {
             // then
             test.assertTrue(e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -1062,14 +1003,14 @@ public class TestArrayList {
         ListIterator listIterator = list.listIterator();
 
         // then
-        test.assertFalse( listIterator.hasNext(), "listIterator() returns non empty iterator for empty list");
+        test.assertFalse(listIterator.hasNext(),"listIterator() returns non empty iterator for empty list");
     }
 
     @Test
     private static void listIterator_listContainsObjects_iterationOverIteratorReturnsObjectsInSameOrder(){
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+        arrayList.addAll(createArrayListWith3Elements());
         boolean result = true;
 
         // when
@@ -1106,15 +1047,14 @@ public class TestArrayList {
     @Test
     private static void listIterator_withIndex_indexOutOfBound_throwsIndexOutOfBoundException(){
         // given
-        String element = "element";
-        list.add(element);
+        list.add(createElement());
 
         // when
         try{
             list.listIterator(1);
         } catch (Exception e){
             // then
-            test.assertTrue( e.getClass().equals(IndexOutOfBoundsException.class), "Exception different than IndexOutOfBoundException " +
+            test.assertTrue(e.getClass().equals(IndexOutOfBoundsException.class),"Exception different than IndexOutOfBoundException " +
                     "has been thrown for listIterator(index) when index is out of bound");
         }
     }
@@ -1125,7 +1065,7 @@ public class TestArrayList {
         boolean result = true;
         int index = 1;
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+        arrayList.addAll(createArrayListWith3Elements());
 
         // when
         list.addAll(arrayList);
@@ -1163,11 +1103,11 @@ public class TestArrayList {
     private static void sublist_startEndIndexTheSame_emptyListReturned(){
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+        arrayList.addAll(createArrayListWith3Elements());
 
         // when
         list.addAll(arrayList);
-        List newList = list.subList(0,0);
+        List newList = list.subList(0, 0);
 
         // then
         test.assertTrue(newList.size() == 0, "sublist() returns non empty list for same start and end index as arguments");
@@ -1177,11 +1117,11 @@ public class TestArrayList {
     private static void sublist_startEndIndexDifferenceOfOneInStartEndIndexes_returnsOneElement(){
         // given
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList("Java", "Academy", "Class"));
+        arrayList.addAll(createArrayListWith3Elements());
 
         // when
         list.addAll(arrayList);
-        List newList = list.subList(0,1);
+        List newList = list.subList(0, 1);
 
         // then
         test.assertTrue( newList.size() == 1, "sublist() returns different amount of elements than 1 for start/end index " +
@@ -1195,7 +1135,7 @@ public class TestArrayList {
 
         // when
         try {
-            list.subList(0,1);
+            list.subList(0, 1);
         } catch (Exception e) {
             // then
             test.assertTrue( e.getClass().equals(NullPointerException.class), "Exception different than null pointer exception" +
@@ -1206,7 +1146,7 @@ public class TestArrayList {
     @Test
     private static void spliterator_listWith_4_elements_returnsIteratorSize_4(){
         // given
-        list.addAll(Arrays.asList("Java", "Academy", "Class", "Course"));
+        list.addAll(createArrayListWith3Elements());
 
         // when
         Spliterator<String> spliterator = list.spliterator();
@@ -1252,9 +1192,5 @@ public class TestArrayList {
         // then
         test.assertTrue(false, "testing test environment");
 
-    }
-
-    private static String createDifferentElement() {
-        return new String("Jakubowski");
     }
 }

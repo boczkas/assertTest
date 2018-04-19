@@ -1,7 +1,7 @@
 public class Result {
-    int pass;
-    int fail;
-    String failMessage;
+    private int pass;
+    private int fail;
+    private String failMessage;
 
     public Result() {
         this.pass = 0;

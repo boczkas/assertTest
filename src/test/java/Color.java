@@ -1,6 +1,6 @@
 public enum Color {
-    // codes for specyfic colors
-    
+    // codes for specyfic colors used in logger
+
         ANSI_RED("\u001B[31m"),
         ANSI_GREEN("\u001B[32m"),
         ANSI_YELLOW("\u001b[33m"),
@@ -13,6 +13,7 @@ public enum Color {
 
     Color(String colorCode) {
         code = colorCode;
+
     }
 
     @Override
