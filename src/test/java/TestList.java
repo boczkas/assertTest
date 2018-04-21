@@ -17,13 +17,12 @@ public class TestList {
         methodStream
                 .filter(method -> method.getAnnotations().length != 0)
                 .filter(method -> method.getAnnotations()[0].annotationType().getName().equals(Test.class.getName()))
-                .forEach(invokeMethod());
+                .forEach(TestList::invokeMethod);
 
         test.showReport();
     }
 
-    private static Consumer<Method> invokeMethod() {
-        return method -> {
+    public static void invokeMethod(Method method) {
             try {
                 list = setupArrayList();
                 method.invoke(method);
@@ -35,7 +34,6 @@ public class TestList {
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-        };
     }
 
     private static ArrayList setupArrayList() {
